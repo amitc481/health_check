@@ -1,0 +1,68 @@
+openapi: 3.0.1
+info:
+  license:
+    name: Intel License
+    url: https://intel.com/licenses/TBD
+  title: DKAM Service API
+  version: 0.1.0-dev
+servers:
+- url: /
+paths:
+  /health_check:
+    get:
+      description: Get all Intel predefined (curated) health_check
+      operationId: get_health_check
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/health_check_resource'
+                type: array
+          description: An array of all curated health_check
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: No resource found at the URI
+      summary: Retrieves all health_check
+      tags:
+      - health_check
+components:
+  responses:
+    "404-NotFound":
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+      description: No resource found at the URI
+  schemas:
+    Id:
+      properties:
+        id:
+          description: "The unique ID of the resource, prefixed with one of the allowed\
+            \ prefixes (e.g., 'pro-123e4567-f89a-72d3-a456-426614174021', 'health_check-342e4567-e89b-16d3-a456-326614174543',\
+            \ 'mod-783e4567-e89b-12a3-a443-566614174456')."
+          pattern: "^(health_check-|pro-|mod-)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          type: string
+      type: object
+    health_check_resource:
+      allOf:
+      - $ref: '#/components/schemas/Id'
+      - $ref: '#/components/schemas/health_check_data'
+    health_check_data:
+      description: A health_check resource instance
+      required:
+      - name
+      type: object
+    ProblemDetails:
+      description: A problem detail to carry a message in a HTTP error response.
+      properties:
+        message:
+          description: "Contains detailed information about the problem, such as its\
+            \ source data that can be used for debugging purposes."
+          readOnly: true
+          type: string
+      type: object
